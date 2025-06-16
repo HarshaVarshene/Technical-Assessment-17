@@ -1,0 +1,147 @@
+<div class="container mt-4">
+  <h2 class="mb-4 text-center">Document Workflow</h2>
+
+  <div class="mb-3 d-flex gap-2">
+    <input type="text" class="form-control" placeholder="Enter document title" [(ngModel)]="title">
+    <button class="btn btn-primary" (click)="createDocument()">Create</button>
+  </div>
+
+  <div *ngFor="let doc of documents" class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <h5 class="card-title">{{ doc.title }}</h5>
+      <div class="mb-2 text-muted">Current Status: {{ doc.state }}</div>
+
+      <!-- Status Progress Bar -->
+      <div class="progress-container mb-3">
+        <div class="progress-line"></div>
+        <div *ngFor="let status of ['DRAFT', 'SUBMITTED', 'APPROVED', 'ARCHIVED']; let i = index" class="progress-step"
+             [ngClass]="{ 'active': status === doc.state }">
+          <div class="circle">{{ i + 1 }}</div>
+          <div class="label">{{ status }}</div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="d-flex flex-wrap gap-2 mt-2">
+        <button class="btn btn-outline-primary" (click)="submit(doc.id)" [disabled]="doc.state !== 'DRAFT'">Submit</button>
+        <button class="btn btn-outline-success" (click)="approve(doc.id)" [disabled]="doc.state !== 'SUBMITTED'">Approve</button>
+        <button class="btn btn-outline-secondary" (click)="archive(doc.id)" [disabled]="doc.state !== 'APPROVED'">Archive</button>
+        <button class="btn btn-warning" 
+        *ngIf="isAdmin"
+        (click)="reset(doc.id, 'DRAFT')">
+  Reset
+</button>
+        <button class="btn btn-outline-danger" (click)="confirmDelete(doc.id)">Delete</button>
+          <button (click)="viewDocument(doc.id)" class="btn btn-outline-primary btn-sm">View Timeline</button>
+      </div>
+      <div *ngIf="selectedDocument">
+  <h4>Timeline for: {{ selectedDocument.title }}</h4>
+  <ul class="history-timeline">
+    <li *ngFor="let entry of selectedDocument.history">
+      <span class="badge bg-info">{{ entry.state }}</span>
+      <span class="ms-2">{{ entry.timestamp | date: 'short' }}</span>
+    </li>
+  </ul>
+</div>
+    </div>
+  </div>
+</div>
+
+
+
+<style>
+.container {
+  max-width: 800px;
+}
+
+.progress-container {
+  position: relative;
+  margin: 20px 0 10px;
+}
+
+.progress-line {
+  position: absolute;
+  top: 15px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: #dee2e6;
+  z-index: 1;
+}
+
+.progress-step {
+  position: relative;
+  z-index: 2;
+  display: inline-block;
+  width: 25%;
+  text-align: center;
+}
+
+.progress-step .circle {
+  width: 30px;
+  height: 30px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background-color: #dee2e6;
+  color: #495057;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.progress-step.active .circle {
+  background-color: #0d6efd;
+  color: #fff;
+}
+
+.progress-step .label {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.btn {
+  transition: transform 0.2s ease;
+}
+.btn:hover {
+  transform: scale(1.05);
+}
+</style>
+<style>
+.timeline {
+  list-style: none;
+  padding-left: 1rem;
+  border-left: 2px solid #ccc;
+}
+.timeline li {
+  margin-bottom: 10px;
+  position: relative;
+}
+.timeline li::before {
+  content: "";
+  position: absolute;
+  left: -10px;
+  top: 3px;
+  width: 8px;
+  height: 8px;
+  background-color: #007bff;
+  border-radius: 50%;
+}
+.history-timeline {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 15px;
+}
+
+.history-timeline li {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+}
+
+
+</style>
+
+
